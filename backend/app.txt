@@ -1,0 +1,9 @@
+uvicorn app.app:app --reload
+source .venv/bin/activate
+
+zmienic w .env dostep do bazy
+zmienic w config.py CROS
+
+
+
+

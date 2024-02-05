@@ -1,0 +1,38 @@
+version: '3'
+services:
+  app:
+
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    container_name: fastapi
+
+    command: uvicorn app.app:app --port 8000 --host 0.0.0.0 --reload 
+
+    ports:
+      - 8000:8000
+   
+    volumes:
+     - .:/backend/app
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: mongodb://mongodb:27017
+
+  frontend:
+ 
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+   
+    container_name: react
+    
+    ports:
+     - 3000:3000
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - 27017:27017
