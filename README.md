@@ -1,5 +1,5 @@
 # CVapp - FARM Stack
-
+![Layout](app.png)
 [Watch CVapp Demo on YouTube](https://youtu.be/KcfQxfvir_g)
 
 ## Overview
