@@ -146,9 +146,14 @@ class SeleniumService:
                 wait = WebDriverWait(self.driver, 1)
                 wait.until(EC.element_to_be_clickable((By.ID, 'onetrust-accept-btn-handler'))).click()
                 site = "nofluffjobs.com"
+                
                 wait = WebDriverWait(self.driver, 1)
-                job_position = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'h1.font-weight-bold.bigger'))).text
-                company_name = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'p.d-flex.align-items-center.mb-0'))).text
+                #job_position = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "font-weight-bold.bigger"))).text
+            
+                company_name = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="postingCompanyUrl"]'))).text
+                job_position =wait.until(EC.presence_of_element_located((By.XPATH, "/html/body/nfj-root/nfj-layout/nfj-main-content/div/nfj-posting-details/div/common-main-loader/div/main/article/div[1]/common-posting-content-wrapper/div[1]/common-posting-header/div/div/h1"))).text
+
+                #company_name = "none"
                 offer_url = url
 
             elif "justjoin.it" in url:
