@@ -188,7 +188,7 @@ class SeleniumService:
 
             elif "bulldogjob" in url:
                 self.driver.get(url)
-                site = "bulldogjob"
+                site = "bulldogjob.pl"
                 wait = WebDriverWait(self.driver, 1)
                 job_position = wait.until(EC.presence_of_element_located((By.XPATH, '//h1[@class]'))).text
                 company_name = wait.until(EC.presence_of_element_located((By.XPATH, '//h2[@class]'))).text
