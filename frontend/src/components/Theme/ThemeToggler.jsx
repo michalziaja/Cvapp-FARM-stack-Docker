@@ -1,6 +1,7 @@
 import React from 'react';
 import { IconButton, useColorMode } from '@chakra-ui/react';
-import { SunIcon, MoonIcon } from '@chakra-ui/icons';
+import { FaMoon, FaRegSun } from "react-icons/fa";
+
 
 export const ThemeToggler = ({ ...rest }) => {
   const { toggleColorMode, colorMode } = useColorMode();
@@ -9,7 +10,7 @@ export const ThemeToggler = ({ ...rest }) => {
     <div style={{ display: 'flex', alignItems: 'flex-start' }}>
       <IconButton
         id="theme-toggler"
-        icon={colorMode === 'dark' ? <SunIcon /> : <MoonIcon />}
+        icon={colorMode === 'dark' ? <FaRegSun /> : <FaMoon />}
         size="sm"
         isRound
         colorScheme="teal"

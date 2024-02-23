@@ -139,7 +139,7 @@ export const Register = () => {
           </FormControl>
             <Button 
             isLoading={isSubmitting}
-            loadingText="Registration..."
+            loadingText="Logging in..."
             width="100%" 
             colorScheme="teal" 
             variant="outline" 

@@ -170,6 +170,17 @@ class SeleniumService:
                 company_name = "none"
                 offer_url = url
 
+            elif "linkedin.com" in url:
+                self.driver.get(url)
+                
+                wait = WebDriverWait(self.driver, 1)
+                wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-control-name='ga-cookie.consent.accept.v4']"))).click()
+                site = "linkedin.com"
+                wait = WebDriverWait(self.driver, 1)
+                job_position = wait.until(EC.presence_of_element_located((By.XPATH, '//h1[@class]'))).text
+                company_name = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "topcard__org-name-link"))).text
+                offer_url = url
+
 
         finally:
             self.driver.quit()

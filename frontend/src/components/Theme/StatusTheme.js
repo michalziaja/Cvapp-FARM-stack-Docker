@@ -9,7 +9,7 @@ export const getColorSchemeForStatus = (status) => {
     case 'Accepted':
       return useColorModeValue('green.400', 'green.600');
     case 'Saved':
-      return useColorModeValue('gray.50', 'gray.600');; 
+      return useColorModeValue('gray.50', 'gray.600');; // You may want to provide a default color or handle other cases
   }
 };
 

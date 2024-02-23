@@ -1,40 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Container,
-  Card,
-  CardBody,
   Heading,
   Input,
   Button,
-  Badge,
+  Spinner,
   Table,
-  Text,
-  InputGroup,
-  InputLeftAddon,
   Thead,
   Tbody,
   Tr,
   Th,
   Td,
-  IconButton,
-  Tooltip,
-  Icon,
   Select,
-  Spinner,
+  Tooltip,
+  IconButton,
+  Icon,
   Modal,
   ModalOverlay,
   ModalContent,
   ModalBody,
   ModalCloseButton,
   useToast,
-  useColorModeValue
+  useColorModeValue,
+  Text,
+  Badge,
+  InputGroup,
+  InputLeftAddon
 } from '@chakra-ui/react';
-import { FaEye, FaTrash } from 'react-icons/fa';
-import axiosInstance from "../services/axios";
-import { getColorSchemeForStatus, getColorSchemeForModalStatus } from "../components/Theme/StatusTheme";
+import { FaTrash, FaRegEdit } from 'react-icons/fa';
+import axiosInstance from '../services/axios';
+import { getColorSchemeForStatus, getColorSchemeForModalStatus } from '../components/Theme/StatusTheme';
 import Cards from '../components/Cards/Cards';
-
 
 export const Jobs = () => {
   const [jobsData, setJobsData] = useState([]);
@@ -42,8 +38,17 @@ export const Jobs = () => {
   const [loading, setLoading] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [jobDetails, setJobDetails] = useState(null);  
+  const [jobDetails, setJobDetails] = useState(null);
   const toast = useToast();
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const entriesPerPage = 10;
+
+  const [sortOrder, setSortOrder] = useState('desc'); // 
+  const [sortBy, setSortBy] = useState( "created_at", 'job_position', "company_name", "site", "status"); // default sort by "created_at"
+
+  const startIndex = (currentPage - 1) * entriesPerPage + 1;
+  const endIndex = startIndex + entriesPerPage - 1;
 
 
   const fetchJobsData = async () => {
@@ -69,30 +74,30 @@ export const Jobs = () => {
       setNewOfferUrl('');
       toast({
         position: 'top',
-        title: "New Offer Added.",
-        status: "success",
+        title: 'New Offer Added.',
+        status: 'success',
         isClosable: true,
         duration: 1500,
       });
     } catch (error) {
       toast({
         position: 'top',
-        title: "Error.",
-        status: "error",
+        title: 'Error.',
+        status: 'error',
         isClosable: true,
         duration: 1800,
       });
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const handleStatusChange = async (data_id, newStatus) => {
     try {
       await axiosInstance.put(`data/${data_id}`, { status: newStatus });
       fetchJobsData();
     } catch (error) {
-      console.error('Błąd podczas zmiany statusu:', error);
+      console.error(error);
     }
   };
 
@@ -103,7 +108,7 @@ export const Jobs = () => {
       setSelectedJob(data_id);
       setIsModalOpen(true);
     } catch (error) {
-      console.error('Błąd podczas pobierania szczegółów ogłoszenia:', error);
+      console.error(error);
     }
   };
 
@@ -119,81 +124,110 @@ export const Jobs = () => {
       fetchJobsData();
       toast({
         position: 'top',
-        title: "Offer Deleted.",
-        status: "error",
+        title: 'Offer Deleted.',
+        status: 'error',
         isClosable: true,
         duration: 1500,
       });
     } catch (error) {
-      console.error('Błąd podczas usuwania ofertowego:', error);
+      console.error(error);
     }
   };
 
+  const getCurrentPageData = () => {
+    const startIndex = (currentPage - 1) * entriesPerPage + 1;
+    const endIndex = startIndex + entriesPerPage - 1;
+    return jobsData.slice(startIndex - 1, endIndex);
+  };
+  
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const handleSort = (columnName) => {
+    setSortOrder((prevSortOrder) => (prevSortOrder === 'asc' ? 'desc' : 'asc'));
+    setSortBy(columnName);
+    
+  };
+
+  const sortData = (data) => {
+    return data.sort((a, b) => {
+      if (sortBy === 'status') {
+        const statusOrder = ['Saved', 'Send', 'Rejected', 'Accepted'];
+        const indexA = statusOrder.indexOf(a.status);
+        const indexB = statusOrder.indexOf(b.status);
+        if (indexA !== -1 && indexB !== -1) {
+          return sortOrder === 'asc' ? indexA - indexB : indexB - indexA;
+        }
+      } else {
+        const valueA = a[sortBy].toUpperCase();
+        const valueB = b[sortBy].toUpperCase();
+        return sortOrder === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
+      }
+    });
+  };
+  
+  const getCurrentPageSortedData = () => {
+    const startIndex = (currentPage - 1) * entriesPerPage;
+    const endIndex = startIndex + entriesPerPage;
+    const sortedData = sortData(jobsData);
+    return sortedData.slice(startIndex, endIndex);
+  };
+
   return (
-    <Box ml={{ base: 0, md: '240px' }} 
-      h="87vh" mr="30px"
-      
-      boxShadow='dark-lg' 
-      borderRadius="10px 10px 10px 10px" 
-      bgColor={useColorModeValue("gray.50", "gray.600")}>
-      <Box mt={5} p={5} colorcheme='white'>
+    
+    <Box ml={{ base: 0, md: '240px' }} h="87vh" mr="30px" boxShadow="dark-lg" borderRadius="10px 10px 10px 10px" bgColor={useColorModeValue('gray.50', 'gray.600')}>
+      <Box mt={5} p={5} colorcheme="white">
         <Cards jobsData={jobsData} fetchJobsData={fetchJobsData}/>
-        
-        <Heading mb={4} mt={10}></Heading>
-        <Box mb={5} mt={4} >
-          {/* <Heading mb={6}>Job Offers</Heading> */}
-          {/* <Badge mb={6} colorScheme='teal' variant='solid' ml='1' fontSize='2em'>Job Offers</Badge> */}
-          
-          
-        
-          <Box mt={3} display="flex">
-            <InputGroup size='md'>
+        <Box mb={5} mt={5}>
+          <Box mt={12} display="flex">
+            <InputGroup size='md' mr={2} ml={8} mt={2}>
               <InputLeftAddon fontSize='1.2em'>
                 URL:
               </InputLeftAddon>
               <Input
                 isInvalid
-                focusBorderColor={useColorModeValue("teal.400", "teal.300")}
-                errorBorderColor={useColorModeValue("gray.400", "gray.800")}
-                placeholder="Offer URL"
+                focusBorderColor={useColorModeValue('teal.400', 'teal.300')}
+                errorBorderColor={useColorModeValue('gray.400', 'gray.800')}
+                placeholder="Paste Offer URL Here"
                 variant="outline"
                 colorScheme="teal"
                 value={newOfferUrl}
                 onChange={(e) => setNewOfferUrl(e.target.value)}
-                mr={4}
+                mr={1}
                 mb={5}
               />
             </InputGroup>
-            <Button colorScheme="teal" onClick={handleAddOffer}>
+            <Button colorScheme="teal" onClick={handleAddOffer} mr={16} mt={2}>
               {loading ? <Spinner size="md" /> : 'ADD OFFER'}
             </Button>
           </Box>
         </Box>
-        
-        <Table variant="simple" colorScheme={useColorModeValue("blue.100", "cyan.700")} size="sm">
+        <Box ml={5} mr={8}>
+        <Table variant="simple" colorScheme={useColorModeValue('blue.100', 'cyan.700')} size="sm">
           <Thead>
             <Tr>
-              <Th>nr</Th>
-              <Th>Job Position</Th>
-              <Th>Company</Th>
-              <Th>Site</Th>
-              <Th>Date Added</Th>
-              <Th>Status</Th>
-              <Th>Link</Th>
-              <Th>Action</Th>
+              <Th width="3%"><Text fontSize="18">nr</Text></Th>
+              <Th width="27%" onClick={() => handleSort('job_position')}><Text fontSize="18">Job Position</Text></Th>
+              <Th width="15%" onClick={() => handleSort('company_name')}><Text fontSize="18">Company</Text></Th>
+              <Th width="10%" onClick={() => handleSort('site')}><Text fontSize="18">Site</Text></Th>
+              <Th width="10%" onClick={() => handleSort('created_at')}><Text fontSize="18">Added</Text></Th>
+              <Th width="9%" onClick={() => handleSort('status')}><Text fontSize="18">Status</Text></Th>
+              <Th width="7%"><Text fontSize="18">Link</Text></Th>
+              <Th width="1%"><Text fontSize="18">Action</Text></Th>
             </Tr>
           </Thead>
           <Tbody>
-            {jobsData.map((job, index) => (
+            {getCurrentPageSortedData().map((job, index) => (
               <Tr key={job.data_id}>
-                <Td>{index + 1}</Td>
+                <Td>{(currentPage - 1) * entriesPerPage + index + 1}</Td>
                 <Td>{job.job_position}</Td>
                 <Td>{job.company_name}</Td>
                 <Td>{job.site}</Td>
                 <Td>{new Date(job.created_at).toLocaleDateString()}</Td>
                 <Td>
                   <Select
-                    variant='outline'
+                    variant="outline"
                     size="sm"
                     value={job.status}
                     onChange={(e) => handleStatusChange(job.data_id, e.target.value)}
@@ -205,25 +239,16 @@ export const Jobs = () => {
                     <option value="Accepted">Accepted</option>
                   </Select>
                 </Td>
-                
                 <Td>
-                  <Button
-                    as="a"
-                    variant='outline'
-                    href={job.offer_url}
-                    colorScheme="teal"
-                    target="_blank"
-                    size="sm"
-                    //rel="noopener noreferrer"
-                  >
-                    Link
+                  <Button as="a" variant="outline" href={job.offer_url} colorScheme="teal" target="_blank" size="sm">
+                    <Text mr={2} ml={2}>Link</Text>
                   </Button>
                 </Td>
                 <Td>
                   <Tooltip label="View" placement="top">
                     <IconButton
-                      variant='outline'
-                      icon={<Icon as={FaEye} />}
+                      variant="outline"
+                      icon={<Icon as={FaRegEdit} />}
                       colorScheme="teal"
                       onClick={() => handleViewOffer(job.data_id)}
                       aria-label={`View offer ${job.data_id}`}
@@ -233,12 +258,13 @@ export const Jobs = () => {
                   </Tooltip>
                   <Tooltip label="Delete" placement="top">
                     <IconButton
-                      variant='outline'
+                      variant="outline"
                       icon={<Icon as={FaTrash} />}
                       colorScheme="red"
                       onClick={() => handleDeleteOffer(job.data_id)}
                       aria-label={`Delete resume ${job.data_id}`}
                       size="sm"
+                      
                     />
                   </Tooltip>
                 </Td>
@@ -246,11 +272,30 @@ export const Jobs = () => {
             ))}
           </Tbody>
         </Table>
-
+        </Box>
+        {/* Pagination */}
+        <Box position="absolute" bottom="4" mr='5' >
+          <Box display="flex" justifyContent="center" >
+            <Button onClick={() => handlePageChange(currentPage - 1)} 
+              isDisabled={currentPage === 1}
+              bg={useColorModeValue('gray.200', 'gray.700')}>
+              Previous
+            </Button>
+            <Text fontSize="26" mx={4}>
+              {currentPage}
+            </Text>
+            <Button onClick={() => handlePageChange(currentPage + 1)} 
+              isDisabled={getCurrentPageData().length < entriesPerPage}
+              bg={useColorModeValue('gray.200', 'gray.700')}
+              >
+              Next
+            </Button>
+          </Box>
+        </Box>
+        
         <Modal isOpen={isModalOpen} onClose={closeModal} isCentered size="xl">
           <ModalOverlay />
           <ModalContent>
-            {/* <ModalHeader>Offer Details</ModalHeader> */}
             <ModalCloseButton />
             <ModalBody>
               {selectedJob && jobDetails && (
@@ -259,7 +304,7 @@ export const Jobs = () => {
                     {jobDetails.job_position}
                   </Heading>
                   <Heading size="md" mb={8}>
-                    <Badge fontSize='0.9em' variant='solid' colorScheme={getColorSchemeForModalStatus(jobDetails.status)}>
+                    <Badge fontSize="0.9em" variant="solid" colorScheme={getColorSchemeForModalStatus(jobDetails.status)}>
                       {jobDetails.status}
                     </Badge>
                   </Heading>
@@ -278,7 +323,6 @@ export const Jobs = () => {
                 </>
               )}
             </ModalBody>
-
           </ModalContent>
         </Modal>
       </Box>

@@ -1,14 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, useColorModeValue, Heading } from '@chakra-ui/react';
-
 import Cards from '../components/Cards/Cards';
+import axiosInstance from '../services/axios';
 
 export const Statistics = () => {
-  const Cards = ({ jobsData }) => {
-    const countJobsByStatus = (status) => {
-      return jobsData.filter(job => job.status === status).length;
-    };
-  }
+  const [jobsData, setJobsData] = useState([]);
+
+  const fetchJobsData = async () => {
+    try {
+      const response = await axiosInstance.get('data/');
+      setJobsData(response.data);
+    } catch (error) {
+      console.error('Błąd podczas pobierania danych:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchJobsData();
+  }, []);
 
   return (
     <Box ml={{ base: 0, md: '240px' }} 
@@ -17,8 +26,8 @@ export const Statistics = () => {
       borderRadius="10px 10px 10px 10px" 
       bgColor={useColorModeValue("gray.50", "gray.600")}>
       <Box mt={5} p={5} colorcheme='white'>
-        <Heading mb={4} mt={10}>Statistics</Heading>
-      <Cards />
+        
+        <Cards jobsData={jobsData} />
       </Box>
     </Box>
   );

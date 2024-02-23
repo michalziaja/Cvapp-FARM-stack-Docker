@@ -2,7 +2,7 @@ import { Flex, Button, Box, useColorModeValue, Stack } from '@chakra-ui/react';
 import { Outlet } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { ThemeToggler } from "../Theme/ThemeToggler";
-
+import { FaSignOutAlt } from 'react-icons/fa'
 export const Navbar = () => {
   const { logout } = useAuth();
   
@@ -30,6 +30,7 @@ export const Navbar = () => {
             mb={0}
             mt={0}
             mr={8}
+            icon={<FaSignOutAlt />}
           >
             Logout
           </Button>

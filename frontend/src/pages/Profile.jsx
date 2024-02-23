@@ -1,8 +1,12 @@
 import React from 'react';
-import { Box, useColorModeValue } from '@chakra-ui/react';
+import { Box, useColorModeValue, Heading } from '@chakra-ui/react';
 import Cards from '../components/Cards/Cards';
 
+
+
 export const Profile = () => {
+
+
   
   return (
     <Box ml={{ base: 0, md: '240px' }} 
@@ -17,3 +21,5 @@ export const Profile = () => {
     </Box>
   );
 };
+
+export default Profile
