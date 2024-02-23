@@ -186,6 +186,13 @@ class SeleniumService:
                 company_name = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "topcard__org-name-link"))).text
                 offer_url = url
 
+            elif "bulldogjob" in url:
+                self.driver.get(url)
+                site = "bulldogjob"
+                wait = WebDriverWait(self.driver, 1)
+                job_position = wait.until(EC.presence_of_element_located((By.XPATH, '//h1[@class]'))).text
+                company_name = wait.until(EC.presence_of_element_located((By.XPATH, '//h2[@class]'))).text
+                offer_url = url
 
         finally:
             self.driver.quit()
